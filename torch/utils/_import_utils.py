@@ -34,7 +34,14 @@ def import_dill() -> Optional[ModuleType]:
     if not dill_available():
         return None
 
-    import dill
+    try:
+        import dill
+    except ImportError:
+        # The import system checks done by dill_available() essentially just
+        # check that e.g. `dill/__init__.py` exists somewhere on sys.path, but
+        # the presence of such a file doesn't guarantee dill is actually
+        # importable. Esoteric file system layouts, custom importers, sys.path
+        # configurations, etc, may pass cursory checks and fail at import.
 
     # XXX: By default, dill writes the Pickler dispatch table to inject its
     # own logic there. This globally affects the behavior of the standard library
